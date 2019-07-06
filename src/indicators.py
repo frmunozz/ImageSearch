@@ -29,7 +29,13 @@ class Indicators(object):
 		print("done!")
 		print("computing distances with L2 metric ...", end="")
 		ini = time.time()
-		dist_vec = [tree.query(i,k=1000)[1] for i in pred_vectors]
+		#dist_vec = [tree.query(i,k=1000)[1] for i in pred_vectors]
+		dist_vec = np.array([[0 for k in range(1000)] for i in range(5000)])
+		def query(i):
+    		lista[i] = tree.query(pred_vectors[i],k=1000)[1]
+ 
+		Parallel(n_jobs=-1, verbose=10, backend="multiprocessing")(
+             map(delayed(query), np.array(range(5000))))
 		end = time.time()
 		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
 

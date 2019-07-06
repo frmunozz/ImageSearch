@@ -3,7 +3,6 @@ from .validator import validate_keys
 import numpy as np
 import time
 
-
 _VALID_KWARGS = {"k1": None, 
 				 "k5": None,
 				 "k10": None,
@@ -23,22 +22,20 @@ class Indicators(object):
 		else:
 			return getattr(self, key)
 
-	def similarity_search(self, real_vectors, pred_vectors):
+	def get_pos_vec(self,real_vectors,pred_vectors):
+
 		print("initializing KDTRee ... ", end="")
 		tree = spatial.KDTree(real_vectors)
 		print("done!")
 		print("computing distances with L2 metric ...", end="")
 		ini = time.time()
-		#dist_vec = [tree.query(i,k=1000)[1] for i in pred_vectors]
-		dist_vec = np.array([[0 for k in range(1000)] for i in range(5000)])
-		def query(i):
-    		lista[i] = tree.query(pred_vectors[i],k=1000)[1]
- 
-		Parallel(n_jobs=-1, verbose=10, backend="multiprocessing")(
-             map(delayed(query), np.array(range(5000))))
+		dist_vec = [tree.query(i,k=1000)[1] for i in pred_vectors]
 		end = time.time()
 		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
+		return dist_vec
 
+	def similarity_search(self, real_vectors, pred_vectors):
+		dist_vec = self.get_pos_vec(real_vectors,pred_vectors)
 		count_v = 0
 		count_i = 0
 		k1 = 0

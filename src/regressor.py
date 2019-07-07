@@ -131,16 +131,18 @@ class Regressor(object):
         print(" done!")
         return self.kwargs["history"]
     
-    def evaluate(self, X_test, y_test):
+    def evaluate(self, X_test, y_test, verbose=True):
         """ evaluate a trained model with a test dataset """
-        print("evaluando test")
+        if verbose:
+            print("evaluando test")
         if self["scale"]:
             X_test = self.kwargs["scaler_input"].transform(X_test)
             y_test = self.kwargs["scaler_output"].transform(y_test)
         score = self.kwargs["model"].evaluate(X_test, y_test, verbose=True)
-        print("    EVALUATION RESULTS :  ")
-        for i in range(len(score)):
-            print("%s: %.2f" % (self.kwargs["model"].metrics_names[i], score[i]))
+        if verbose:
+            print("    EVALUATION RESULTS :  ")
+            for i in range(len(score)):
+                print("%s: %.2f" % (self.kwargs["model"].metrics_names[i], score[i]))
         return score
     
     def set_scaled(self, X_train, y_train):

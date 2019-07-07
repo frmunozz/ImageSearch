@@ -2,6 +2,7 @@ from scipy import spatial
 from .validator import validate_keys
 import numpy as np
 import time
+from .utils import paral_query, print_histo
 
 _VALID_KWARGS = {"k1": None, 
 				 "k5": None,
@@ -29,7 +30,7 @@ class Indicators(object):
 		print("done!")
 		print("computing distances with L2 metric ...", end="")
 		ini = time.time()
-		dist_vec = [tree.query(i,k=1000)[1] for i in pred_vectors]
+		dist_vec = paral_query(tree,pred_vectors)
 		end = time.time()
 		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
 		return dist_vec
@@ -44,6 +45,7 @@ class Indicators(object):
 
 		min_dist_vec = []
 		print("getting sorted ranking ...", end="")
+		ini = time.time()
 		for v in dist_vec:
 			valor_aux = np.where(v==count_i)
 			if valor_aux[0].size == 0:
@@ -60,6 +62,8 @@ class Indicators(object):
 			if count_v>4:
 				count_v = 0
 				count_i+=1
+		end = time.time()
+		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
 
 		print("done!")
 		self.kwargs["min_dist_vec"] = np.array(min_dist_vec)
@@ -88,3 +92,9 @@ class Indicators(object):
 
 	def mean_rank(self):
 		self.kwargs["mean"] = np.mean(self.kwargs["min_dist_vec"])
+		return self.kwargs["mean"]
+
+	def get_formated_data(self):
+		return [self.recall_at_1(),self.recall_at_5(),self.recall_at_10(), self.MRR(), self.mean_rank()]
+
+

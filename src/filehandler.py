@@ -66,16 +66,16 @@ class DataHandler(object):
 
 	def load_test(self, verbose=True):
 		""" load the data from the test set """
-		names_file = "{}{}/test_A_images_names.txt".format(self.root, self.test_folder)
-		captions_file = "{}{}/test_A_captions.txt".format(self.root, self.test_folder)
-		vectors_file = "{}{}/test_A_images_vectors.bin".format(self.root, self.test_folder)
+		names_file = "{}{}/{}images_names.txt".format(self.root, self.test_folder,self.test_folder.replace('data',''))
+		captions_file = "{}{}/{}captions.txt".format(self.root, self.test_folder,self.test_folder.replace('data',''))
+		vectors_file = "{}{}/{}images_vectors.bin".format(self.root, self.test_folder,self.test_folder.replace('data',''))
 		return self._load(names_file, vectors_file, captions_file, 1000, verbose=verbose)
 
-	def load_simple_test(self):
+	def load_simple_test(self, abc = "A"):
 		""" load just the image descriptors from the test set """
-		names_file = "{}{}/test_A_images_names.txt".format(self.root, self.test_folder)
-		captions_file = "{}{}/test_A_captions.txt".format(self.root, self.test_folder)
-		vectors_file = "{}{}/test_A_images_vectors.bin".format(self.root, self.test_folder)
+		names_file = "{}{}/test_{}_images_names.txt".format(self.root, self.test_folder, abc)
+		captions_file = "{}{}/test_{}_captions.txt".format(self.root, self.test_folder, abc)
+		vectors_file = "{}{}/test_{}_images_vectors.bin".format(self.root, self.test_folder,abc)
 		(names, vectors) = load_file(names_file, vectors_file, 1000, self.vectors_dimension)
 		return np.array(vectors)
 

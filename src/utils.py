@@ -18,7 +18,7 @@ def load(a_tree, a_pred_vectors):
 def paral_query(tree, pred_vectors):
 	load(tree,pred_vectors)
 	n = len(pred_vectors)
-	res = Parallel(n_jobs=-1, verbose=10, backend="multiprocessing", batch_size = 5)(
+	res = Parallel(n_jobs=-1, verbose=4, backend="multiprocessing", batch_size = 5)(
              map(delayed(ordered_distance), np.array(range(n))))
 	res = np.array(res)
 	return res

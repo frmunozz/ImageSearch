@@ -113,3 +113,38 @@ class DataHandler(object):
 			print("done")
 
 		return train_text_descriptors, test_text_descriptors, train_vectors, test_vectors
+
+	def get_data_test(self, method="tf-idf", stop_words=None, ngram_range=(1, 3), max_df=0.8, min_df=0.002, verbose=True):
+		""" loadd test data  and compute the text descriptors using one of two methods: count-vectorizer
+		    or tf-idf """
+		train_names, train_vectors, train_image_captions = self.load_train(verbose=verbose)
+		test_names, test_vectors, test_image_captions = self.load_test(verbose=verbose)
+
+		train_captions = train_image_captions[:,1]
+		test_captions = test_image_captions[:,1]
+		if method == "tf-idf":
+			if verbose:
+				print("doing vectorization with TfidfVectorizer")
+			vectors = TfidfVectorizer(lowercase=True,ngram_range=ngram_range,max_df=max_df,min_df=min_df, stop_words=stop_words)
+		elif method == "count-vectorizer":
+			if verbose:
+				print("doing vectorization with CountVectorizer")
+			vectors = CountVectorizer(lowercase=True,ngram_range=ngram_range,max_df=max_df,min_df=min_df,binary=False, stop_words=stop_words)
+		else:
+			raise ValueError("method '{}' is not valid".format(method))
+
+		if verbose:
+			print("fitting ...", end="")
+		vectors.fit(train_captions)
+		if verbose:
+			print("done")
+
+		if verbose:
+			print("getting test vectors transforms ...", end="")
+		test_text_descriptors = vectors.transform(test_captions)
+		if verbose:
+			print("text descriptor shape:", test_text_descriptors.shape)
+			print("done")
+
+		return test_text_descriptors
+

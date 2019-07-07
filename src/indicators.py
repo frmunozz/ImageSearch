@@ -2,7 +2,7 @@ from scipy import spatial
 from .validator import validate_keys
 import numpy as np
 import time
-from .utils import paral_query, print_histo
+from .utils import paral_query, print_histo, parallel_query
 
 _VALID_KWARGS = {"k1": None, 
 				 "k5": None,
@@ -23,20 +23,21 @@ class Indicators(object):
 		else:
 			return getattr(self, key)
 
-	def get_pos_vec(self,real_vectors,pred_vectors):
+	def get_pos_vec(self,real_vectors,pred_vectors, n_jobs=-1):
 
 		print("initializing KDTRee ... ", end="")
 		tree = spatial.KDTree(real_vectors)
 		print("done!")
-		print("computing distances with L2 metric ...", end="")
+		print(" :::: computing distances with L2 metric :::: ")
 		ini = time.time()
-		dist_vec = paral_query(tree,pred_vectors)
+		# dist_vec = paral_query(tree,pred_vectors)
+		dist_vec = parallel_query(tree, pred_vectors, n_jobs=n_jobs) 
 		end = time.time()
-		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
+		print(" :::: done! (elapse time: {} secs.) :::: ".format(round(end - ini, 2)))
 		return dist_vec
 
-	def similarity_search(self, real_vectors, pred_vectors):
-		dist_vec = self.get_pos_vec(real_vectors,pred_vectors)
+	def similarity_search(self, real_vectors, pred_vectors, n_jobs=-1):
+		dist_vec = self.get_pos_vec(real_vectors,pred_vectors, n_jobs=n_jobs)
 		count_v = 0
 		count_i = 0
 		k1 = 0

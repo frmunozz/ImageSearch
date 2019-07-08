@@ -71,12 +71,12 @@ class DataHandler(object):
 		vectors_file = "{}{}/{}images_vectors.bin".format(self.root, self.test_folder,self.test_folder.replace('data',''))
 		return self._load(names_file, vectors_file, captions_file, 1000, verbose=verbose)
 
-	def load_simple_test(self, abc = "A"):
+	def load_simple_test(self, abc = "A", verbose=True):
 		""" load just the image descriptors from the test set """
 		names_file = "{}{}/test_{}_images_names.txt".format(self.root, self.test_folder, abc)
 		captions_file = "{}{}/test_{}_captions.txt".format(self.root, self.test_folder, abc)
 		vectors_file = "{}{}/test_{}_images_vectors.bin".format(self.root, self.test_folder,abc)
-		(names, vectors) = load_file(names_file, vectors_file, 1000, self.vectors_dimension)
+		(names, vectors) = load_file(names_file, vectors_file, 1000, self.vectors_dimension, verbose=verbose)
 		return np.array(vectors)
 
 	def get_data(self, method="tf-idf", stop_words=None, ngram_range=(1, 3), max_df=0.8, min_df=0.002, verbose=True):

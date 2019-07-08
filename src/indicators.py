@@ -23,21 +23,23 @@ class Indicators(object):
 		else:
 			return getattr(self, key)
 
-	def get_pos_vec(self,real_vectors,pred_vectors, n_jobs=-1):
-
-		print("initializing KDTRee ... ", end="")
+	def get_pos_vec(self,real_vectors,pred_vectors, n_jobs=-1, verbose=True):
+		if verbose:
+			print("initializing KDTRee ... ", end="")
 		tree = spatial.KDTree(real_vectors)
-		print("done!")
-		print(" :::: computing distances with L2 metric :::: ")
+		if verbose:
+			print("done!")
+			print(" :::: computing distances with L2 metric :::: ")
 		ini = time.time()
 		# dist_vec = paral_query(tree,pred_vectors)
 		dist_vec = parallel_query(tree, pred_vectors, n_jobs=n_jobs) 
 		end = time.time()
-		print(" :::: done! (elapse time: {} secs.) :::: ".format(round(end - ini, 2)))
+		if verbose:
+			print(" :::: done! (elapse time: {} secs.) :::: ".format(round(end - ini, 2)))
 		return dist_vec
 
-	def similarity_search(self, real_vectors, pred_vectors, n_jobs=-1):
-		dist_vec = self.get_pos_vec(real_vectors,pred_vectors, n_jobs=n_jobs)
+	def similarity_search(self, real_vectors, pred_vectors, n_jobs=-1, verbose=True):
+		dist_vec = self.get_pos_vec(real_vectors,pred_vectors, n_jobs=n_jobs, verbose=verbose)
 		count_v = 0
 		count_i = 0
 		k1 = 0
@@ -45,12 +47,10 @@ class Indicators(object):
 		k10 = 0
 
 		min_dist_vec = []
-		print("getting sorted ranking ...", end="")
+		if verbose:
+			print("getting sorted ranking ...", end="")
 		ini = time.time()
 		for v in dist_vec:
-			valor_aux = np.where(v==count_i)
-			if valor_aux[0].size == 0:
-				print("problemas!")
 			valor_aux = np.where(v==count_i)[0][0]+1 #le puse +1 para ajustar los indices desde el 1 al 1000#estos if para ir contando cuantos valores estan bajo k
 			if valor_aux<11:
 				k10+=1
@@ -64,9 +64,8 @@ class Indicators(object):
 				count_v = 0
 				count_i+=1
 		end = time.time()
-		print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
-
-		print("done!")
+		if verbose:
+			print("done! (elapse time: {} secs.)".format(round(end - ini, 2)))
 		self.kwargs["min_dist_vec"] = np.array(min_dist_vec)
 		self.kwargs["k1"] = k1
 		self.kwargs["k5"] = k5

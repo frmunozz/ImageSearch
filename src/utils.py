@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import multiprocessing as mp
 import copy
+import time
 
 
 tree = None
@@ -43,11 +44,9 @@ def worker(kdtree, query_list, ini, end, queue, job_number):
 
 def parallel_query(kdtree, vectors, n_jobs=-1):
 	if n_jobs == -1:
-		print("no number of jobs where specified")
-		print("There are %d CPUs on this machine" % mp.cpu_count())
 		n_jobs = mp.cpu_count()
-
-	print("launching %d jobs: " % n_jobs, end="")
+	ini_time = time.time()
+	print("-> launching %d jobs: " % n_jobs, end="")
 	
 	m = mp.Manager()
 	r_queue = m.Queue()
@@ -64,16 +63,16 @@ def parallel_query(kdtree, vectors, n_jobs=-1):
 		ini = end
 
 	jobs.append(mp.Process(target=worker, args=(kdtree, vectors, ini, N, r_queue, n_jobs-1)))
-	print(". DONE!")
+	print(". DONE!", end="")
 	jobs[-1].start()
 
-	print("waiting %d jobs: " % n_jobs, end="")
+	print(" || waiting %d jobs: " % n_jobs, end="")
 	for p in jobs:
 		p.join()
 		print(".", end="")
-	print(" DONE!")
+	print(" DONE!", end="")
 
-	print("grouping the data ...", end="")
+	print(" || grouping data ---", end="")
 	result = {}
 	while not r_queue.empty():
 		par = r_queue.get()
@@ -83,9 +82,8 @@ def parallel_query(kdtree, vectors, n_jobs=-1):
 	for i in range(n_jobs):
 		dists.extend(result[i])
 	dists = np.array(dists)
-
-	print(" DONE! [shape: (%d, %d)]" % (dists.shape[0], dists.shape[1]))
-	print(dists.shape)
+	end_time = time.time()
+	print(" DONE! [elapse time: {}]".format(round(end_time-ini_time, 3)))
 	return dists
 
 

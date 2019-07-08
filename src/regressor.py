@@ -6,6 +6,8 @@ from sklearn.utils import shuffle as shfle
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 from .validator import validate_keys
 import json
 from keras.models import load_model
@@ -111,24 +113,28 @@ class Regressor(object):
         self.kwargs["history"] = history.history
         return history
     
-    def save(self, name):
+    def save(self, name, verbose=True):
         """ save the trained model to disk  in h5 files, also save history dictionary in a json """
-        print("saving model to disk ...", end="")
+        if verbose:
+            print("saving model to disk ...", end="")
         # save model to hdf5
         self.kwargs["model"].save("./model/" + name + ".h5")
 
         # save history
         json.dump(self.kwargs["history"], open("./model/" + name + "_history.json", "w"))
-        print(" done!")
+        if verbose:
+            print(" done!")
     
         
-    def load(self, name, custom_objects=None):
+    def load(self, name, custom_objects=None, verbose=True):
         """ load model and history from disk. It could need to define some custom objects (metrics rmse and r_square )"""
-        print("loading model from disk ...", end="")
+        if verbose:
+            print("loading model from disk ...", end="")
         self.kwargs["model"] = load_model("./model/" + name + ".h5", custom_objects=custom_objects)
         # load history
         self.kwargs["history"] = json.load(open("./model/" + name + "_history.json", 'r'))
-        print(" done!")
+        if verbose:
+            print(" done!")
         return self.kwargs["history"]
     
     def evaluate(self, X_test, y_test, verbose=True):
@@ -138,7 +144,7 @@ class Regressor(object):
         if self["scale"]:
             X_test = self.kwargs["scaler_input"].transform(X_test)
             y_test = self.kwargs["scaler_output"].transform(y_test)
-        score = self.kwargs["model"].evaluate(X_test, y_test, verbose=True)
+        score = self.kwargs["model"].evaluate(X_test, y_test, verbose=verbose)
         if verbose:
             print("    EVALUATION RESULTS :  ")
             for i in range(len(score)):

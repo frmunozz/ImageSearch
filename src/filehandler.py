@@ -45,7 +45,7 @@ class DataHandler(object):
 		if test_folder is not None:
 			self.test_folder = test_folder 
 
-	def _load(self, names_file, vectors_file, captions_file, num_vectors, verbose=True):
+	def _load(self, names_file, vectors_file, captions_file, num_vectors, verbose=True, n=5):
 		""" internal method to read image descriptors and captions from a dataset.
 		    this method will repeate every image descriptor 5 times to match with the
 		    captions matrix shape  """
@@ -53,7 +53,7 @@ class DataHandler(object):
 		captions = load_captions(captions_file)
 		vectors_for_captions = []
 		for vector in vectors:
-			for _ in range(5):
+			for _ in range(n):
 				vectors_for_captions.append(vector)
 		return names, np.array(vectors_for_captions), np.array(captions)
 
@@ -64,12 +64,12 @@ class DataHandler(object):
 		vectors_file = "{}{}/train_images_vectors.bin".format(self.root, self.train_folder)
 		return self._load(names_file, vectors_file, captions_file, 20000, verbose=verbose)
 
-	def load_test(self, verbose=True):
+	def load_test(self, verbose=True, n=5):
 		""" load the data from the test set """
 		names_file = "{}{}/{}images_names.txt".format(self.root, self.test_folder,self.test_folder.replace('data',''))
 		captions_file = "{}{}/{}captions.txt".format(self.root, self.test_folder,self.test_folder.replace('data',''))
 		vectors_file = "{}{}/{}images_vectors.bin".format(self.root, self.test_folder,self.test_folder.replace('data',''))
-		return self._load(names_file, vectors_file, captions_file, 1000, verbose=verbose)
+		return self._load(names_file, vectors_file, captions_file, 1000, verbose=verbose, n=n)
 
 	def load_simple_test(self, abc = "A", verbose=True):
 		""" load just the image descriptors from the test set """
